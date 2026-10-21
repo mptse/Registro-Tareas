@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}{{ heading }}{% endblock %}
+{% block content %}
+<section class="form-card">
+  <a class="back-link" href="{{ url_for('index') }}">← Volver a mis tareas</a>
+  <div class="eyebrow">TU ESPACIO PERSONAL</div>
+  <h1>{{ heading }}</h1>
+  <p class="muted">Anota lo importante. Puedes cambiarlo cuando quieras.</p>
+  <form method="post" class="form-stack">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label for="title">Título</label>
+    <input id="title" name="title" value="{{ form_title }}" required maxlength="120" autofocus placeholder="Por ejemplo, preparar la presentación">
+    <label for="description">Descripción <span class="optional">· opcional</span></label>
+    <textarea id="description" name="description" rows="5" maxlength="2000" placeholder="Añade algún detalle…">{{ form_description }}</textarea>
+    <div class="form-actions">
+      <a class="button button-quiet" href="{{ url_for('index') }}">Cancelar</a>
+      <button class="button button-primary" type="submit">Guardar tarea</button>
+    </div>
+  </form>
+</section>
+{% endblock %}

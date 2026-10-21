@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Mis tareas{% endblock %}
+{% block content %}
+<section class="dashboard-heading">
+  <div>
+    <div class="eyebrow">TU ESPACIO DE TRABAJO</div>
+    <h1>Mis tareas</h1>
+    <p class="muted">Un paso a la vez. Lo tienes.</p>
+  </div>
+  <a class="button button-primary" href="{{ url_for('create_task') }}"><span aria-hidden="true">＋</span> Nueva tarea</a>
+</section>
+<nav class="filters" aria-label="Filtrar tareas">
+  <a class="{{ 'selected' if status == 'todas' else '' }}" href="{{ url_for('index', estado='todas') }}">Todas</a>
+  <a class="{{ 'selected' if status == 'pendientes' else '' }}" href="{{ url_for('index', estado='pendientes') }}">Pendientes</a>
+  <a class="{{ 'selected' if status == 'completadas' else '' }}" href="{{ url_for('index', estado='completadas') }}">Completadas</a>
+</nav>
+{% if tasks %}
+  <section class="task-list" aria-label="Lista de tareas">
+    {% for task in tasks %}
+    <article class="task-card {{ 'task-completed' if task.completed else '' }}">
+      <div class="task-check" aria-hidden="true">{{ '✓' if task.completed else '' }}</div>
+      <div class="task-content">
+        <h2>{{ task.title }}</h2>
+        {% if task.description %}<p>{{ task.description }}</p>{% endif %}
+        <time datetime="{{ task.updated_at }}">Actualizada {{ task.updated_at[:10] }}</time>
+      </div>
+      <div class="task-actions">
+        <form method="post" action="{{ url_for('toggle_task', task_id=task.id) }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button class="button button-small {{ 'button-outline' if task.completed else 'button-soft' }}" type="submit">{{ 'Reabrir' if task.completed else 'Completar' }}</button>
+        </form>
+        <a class="icon-button" href="{{ url_for('edit_task', task_id=task.id) }}" aria-label="Editar {{ task.title }}" title="Editar">✎</a>
+        <form method="post" action="{{ url_for('delete_task', task_id=task.id) }}" onsubmit="return confirm('¿Eliminar esta tarea? Esta acción no se puede deshacer.');">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button class="icon-button danger" type="submit" aria-label="Eliminar {{ task.title }}" title="Eliminar">×</button>
+        </form>
+      </div>
+    </article>
+    {% endfor %}
+  </section>
+{% else %}
+  <section class="empty-state">
+    <div class="empty-icon">✦</div>
+    <h2>{% if status == 'completadas' %}Aún no hay tareas completadas{% elif status == 'pendientes' %}¡Todo al día!{% else %}Empieza con una tarea{% endif %}</h2>
+    <p class="muted">{% if status == 'pendientes' %}No tienes tareas pendientes en este momento.{% else %}Anota una tarea para despejar la mente y empezar a avanzar.{% endif %}</p>
+    {% if status != 'completadas' %}<a class="button button-primary" href="{{ url_for('create_task') }}">Crear mi primera tarea</a>{% endif %}
+  </section>
+{% endif %}
+{% endblock %}
